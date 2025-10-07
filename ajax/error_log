@@ -1,0 +1,58 @@
+[01-Sep-2025 13:00:27 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'FROM schedules
+     WHERE certificate = 'BESO Application' AND res_id = ? AN...' at line 4 in /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/check_first_time_jobseeker_conflict.php:63
+Stack trace:
+#0 /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/check_first_time_jobseeker_conflict.php(63): mysqli->prepare()
+#1 {main}
+  thrown in /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/check_first_time_jobseeker_conflict.php on line 63
+[01-Sep-2025 13:11:29 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'FROM schedules
+     WHERE certificate = 'BESO Application' AND res_id = ? AN...' at line 4 in /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/check_first_time_jobseeker_conflict.php:61
+Stack trace:
+#0 /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/check_first_time_jobseeker_conflict.php(61): mysqli->prepare()
+#1 {main}
+  thrown in /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/check_first_time_jobseeker_conflict.php on line 61
+[01-Sep-2025 13:20:44 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'FROM schedules
+     WHERE certificate = 'BESO Application' AND res_id = ? AN...' at line 4 in /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/check_first_time_jobseeker_conflict.php:61
+Stack trace:
+#0 /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/check_first_time_jobseeker_conflict.php(61): mysqli->prepare()
+#1 {main}
+  thrown in /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/check_first_time_jobseeker_conflict.php on line 61
+[01-Sep-2025 13:37:54 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'ApprovedCaptain' in 'WHERE' in /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/check_first_time_jobseeker_conflict.php:63
+Stack trace:
+#0 /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/check_first_time_jobseeker_conflict.php(63): mysqli->prepare()
+#1 {main}
+  thrown in /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/check_first_time_jobseeker_conflict.php on line 63
+[01-Sep-2025 13:38:22 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Illegal parameter data types varchar and row for operation '=' in /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/check_first_time_jobseeker_conflict.php:63
+Stack trace:
+#0 /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/check_first_time_jobseeker_conflict.php(63): mysqli->prepare()
+#1 {main}
+  thrown in /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/check_first_time_jobseeker_conflict.php on line 63
+[06-Sep-2025 02:51:23 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'c.status' in 'WHERE' in /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/fetch_time_slots.php:106
+Stack trace:
+#0 /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/fetch_time_slots.php(106): mysqli->prepare()
+#1 {main}
+  thrown in /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/fetch_time_slots.php on line 106
+[06-Sep-2025 02:51:41 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'c.status' in 'WHERE' in /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/fetch_time_slots.php:105
+Stack trace:
+#0 /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/fetch_time_slots.php(105): mysqli->prepare()
+#1 {main}
+  thrown in /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/fetch_time_slots.php on line 105
+[06-Sep-2025 02:51:42 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'c.status' in 'WHERE' in /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/fetch_time_slots.php:105
+Stack trace:
+#0 /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/fetch_time_slots.php(105): mysqli->prepare()
+#1 {main}
+  thrown in /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/fetch_time_slots.php on line 105
+[06-Sep-2025 02:51:49 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'c.status' in 'WHERE' in /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/fetch_time_slots.php:105
+Stack trace:
+#0 /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/fetch_time_slots.php(105): mysqli->prepare()
+#1 {main}
+  thrown in /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/fetch_time_slots.php on line 105
+[06-Sep-2025 02:53:08 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'c.status' in 'WHERE' in /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/fetch_time_slots.php:105
+Stack trace:
+#0 /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/fetch_time_slots.php(105): mysqli->prepare()
+#1 {main}
+  thrown in /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/fetch_time_slots.php on line 105
+[06-Sep-2025 02:53:10 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'c.status' in 'WHERE' in /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/fetch_time_slots.php:105
+Stack trace:
+#0 /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/fetch_time_slots.php(105): mysqli->prepare()
+#1 {main}
+  thrown in /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/fetch_time_slots.php on line 105

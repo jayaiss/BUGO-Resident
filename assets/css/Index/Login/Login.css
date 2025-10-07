@@ -1,0 +1,156 @@
+/* =========================================================
+   LIGHT-ONLY THEME — soft/dirty white base, playful accents
+   ========================================================= */
+:root{
+  --bg: #F7F7F2;           /* dirty white */
+  --bg-2:#F3F2EC;          /* slightly warmer */
+  --surface:#FFFFFF;       /* cards */
+  --text:#293042;          /* dark slate */
+  --muted:#6B7280;         /* captions */
+  --primary:#0D6EFD;       /* bootstrap primary */
+  --primary-600:#0B5ED7;
+  --accent-1:#60A5FA;      /* sky */
+  --accent-2:#22D3EE;      /* cyan */
+  --accent-3:#A78BFA;      /* violet */
+  --accent-4:#34D399;      /* green */
+  --ring: rgba(13,110,253,.18);
+  --shadow-sm:0 6px 18px rgba(2,8,23,.06);
+  --shadow:   0 14px 38px rgba(2,8,23,.08);
+  --radius: 16px;
+  --radius-sm:12px;
+}
+
+html{scroll-behavior:smooth}
+body{
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  color:var(--text);
+  background:
+    radial-gradient(1100px 420px at 12% 0%, rgba(13,110,253,.08), transparent 60%),
+    radial-gradient(900px 380px at 88% 6%, rgba(139,92,246,.08), transparent 55%),
+    linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+  min-height:100dvh;
+}
+
+/* --- Global helpers --- */
+.container-max{max-width:1120px}
+.rounded-xl{border-radius:var(--radius)}
+.rounded-lg{border-radius:var(--radius-sm)}
+.shadow-soft{box-shadow:var(--shadow)}
+.hover-lift{transition:transform .35s ease, box-shadow .35s ease}
+.hover-lift:hover{transform:translateY(-6px); box-shadow:0 22px 46px rgba(2,8,23,.12)}
+.focus-ring:focus{outline:4px solid var(--ring); outline-offset:2px}
+
+/* Fancy gradient border utility */
+.border-gradient{position:relative}
+
+/* --- Skip link for a11y --- */
+.skip-link{position:absolute; left:-999px; top:auto; width:1px; height:1px; overflow:hidden}
+.skip-link:focus{left:16px; top:16px; width:auto; height:auto; padding:.5rem .75rem; background:#fff; color:#000; border-radius:8px; z-index:10000}
+
+/* --- Navbar --- */
+.navbar{--bs-navbar-color: var(--text); background:transparent; transition: background .35s ease, box-shadow .35s ease}
+.navbar.stuck{backdrop-filter:saturate(180%) blur(10px); background: rgba(255,255,255,.86); box-shadow: var(--shadow-sm)}
+.nav-link{font-weight:600}
+.btn-cta{border-radius:999px; padding:.5rem 1rem; font-weight:700}
+
+/* --- Hero --- */
+.hero{position:relative; overflow:hidden; isolation:isolate}
+.hero .blob{position:absolute; filter:blur(30px); opacity:.55; animation: float 14s ease-in-out infinite both; will-change:transform}
+.blob.b1{top:-80px; left:-60px; width:360px; height:360px; background: conic-gradient(from 0deg, var(--accent-1), var(--accent-2), var(--accent-3), var(--accent-1)); border-radius: 30% 70% 70% 30% / 30% 38% 62% 70%}
+.blob.b2{bottom:-140px; right:-100px; width:420px; height:420px; background: conic-gradient(from 180deg, var(--accent-4), #F59E0B, #EF4444, var(--accent-4)); border-radius: 60% 40% 35% 65% / 57% 69% 31% 43%; animation-duration:16s}
+@keyframes float{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(18px) rotate(8deg)}}
+
+.hero-title{font-weight:900; line-height:1.05; letter-spacing:-.02em; font-size: clamp(2rem, 3vw + 1rem, 3rem)}
+.gradient-text{background: linear-gradient(90deg, #0ea5e9, #8b5cf6, #ef4444); -webkit-background-clip:text; background-clip:text; color:transparent}
+.lead{color:var(--muted)}
+
+/* --- Cards --- */
+.glass{background: linear-gradient(180deg, rgba(255,255,255,.80), rgba(255,255,255,.70)); border:1px solid rgba(2,8,23,.06); backdrop-filter: blur(8px)}
+.stat-card{background:var(--surface); border:1px solid rgba(2,8,23,.06); border-radius:var(--radius); padding:1.25rem; display:flex; gap:1rem; align-items:center; box-shadow:var(--shadow-sm)}
+.stat-icon{width:52px; height:52px; display:grid; place-items:center; border-radius:14px; background:rgba(13,110,253,.10)}
+.stat-value{font-weight:900; font-size:clamp(1.75rem,2vw+1rem,2.5rem)}
+
+/* --- Step chips --- */
+.step-chip{display:flex;align-items:center; gap:.75rem; padding: .75rem 1rem; border-radius:999px; background:var(--surface); border:1px solid rgba(2,8,23,.06)}
+
+/* --- Officials --- */
+.official-card{background:var(--surface); border:1px solid rgba(2,8,23,.06); border-radius:var(--radius); padding:1rem; text-align:center; transition:transform .3s ease}
+.official-card:hover{transform:translateY(-4px)}
+.official-card img{width:120px; height:120px; object-fit:cover; border-radius:50%; border:3px solid rgba(2,8,23,.06)}
+
+/* --- News --- */
+.news-card{border:1px solid rgba(2,8,23,.06); border-radius:var(--radius); overflow:hidden; background:var(--surface); box-shadow:var(--shadow-sm)}
+.news-card img{height:180px; width:100%; object-fit:cover; transition:transform .45s ease}
+.news-card:hover img{transform:scale(1.04)}
+
+/* --- Buttons micro-interactions --- */
+.btn-primary{--bs-btn-bg:var(--primary); --bs-btn-border-color:var(--primary); --bs-btn-hover-bg:var(--primary-600); --bs-btn-hover-border-color:var(--primary-600)}
+.btn-outline-dark{border-width:2px}
+.btn-ghost{background:#fff; border:1px solid rgba(2,8,23,.06)}
+
+/* --- Forms --- */
+.form-control{border-radius:12px; border:1.5px solid #e5e7eb}
+.form-control:focus{border-color: var(--primary); box-shadow: 0 0 0 6px rgba(13,110,253,.12)}
+
+/* --- Reveal on scroll (CSS side) --- */
+[data-reveal]{opacity:0; transform: translateY(10px); transition: opacity .6s cubic-bezier(.2,.65,.2,1), transform .6s cubic-bezier(.2,.65,.2,1)}
+.is-revealed{opacity:1; transform: none}
+
+/* --- Back to top --- */
+#backToTop{position:fixed; right:16px; bottom:16px; z-index:1000; opacity:0; visibility:hidden; transform: translateY(8px); transition: .3s}
+#backToTop.show{opacity:1; visibility:visible; transform:none}
+
+/* --- Section dividers (soft waves without images) --- */
+.section-divider{height:24px; background:linear-gradient(90deg, rgba(13,110,253,.15), rgba(99,102,241,.15) 40%, rgba(34,197,94,.15)); mask: radial-gradient(18px at 12px 12px, #0000 98%, #000) calc(18px/2) calc(18px/2)/18px 18px}
+
+/* --- Touch friendly tweaks --- */
+@media (max-width: 576px){
+  .navbar .btn-cta{padding:.55rem .9rem}
+  .news-card img{height:160px}
+}
+
+/* --- Respect reduced motion --- */
+@media (prefers-reduced-motion: reduce) {
+  *{animation:none !important; transition:none !important}
+}
+.navbar .nav-link{
+position:relative;
+transition:color .3s ease;
+}
+.navbar .nav-link:hover,
+.navbar .nav-link:focus{
+color:var(--primary);
+}
+.navbar .nav-link::after{
+content:'';
+position:absolute;
+left:0; bottom:-6px;
+width:0; height:2px;
+background:var(--primary);
+transition:width .3s ease;
+}
+.navbar .nav-link:hover::after,
+.navbar .nav-link.active::after{
+width:100%;
+}
+.hero-brand {
+  position: sticky;
+  top: 20px;    /* adjust spacing */
+  left: 10px;
+  z-index: 5;   /* above background */
+}
+
+.hero-brand img {
+  height: 250px;
+}
+
+.hero-brand span {
+  color: #1e293b; /* dark text */
+  text-shadow: 0 1px 2px rgba(255,255,255,0.6); /* keeps text readable */
+}
+#home {
+  position: relative;
+}
+
+/* optional: keep navbar above everything */
+.navbar { z-index: 1030; }

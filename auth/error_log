@@ -1,0 +1,1 @@
+[03-Sep-2025 13:37:37 UTC] PHP Fatal error:  strict_types declaration must be the very first statement in the script in /home/hzvl0mk3xdsn/public_html/bugoportal.site/auth/verify_2fa.php on line 6

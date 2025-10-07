@@ -1,0 +1,215 @@
+/* Layout: make footer sticky on short pages */
+#layoutSidenav_content {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+#layoutSidenav_content > main { flex: 1 0 auto; }
+footer { flex-shrink: 0; }
+
+/* Sidebar: spacing, hover, active, focus */
+.sb-sidenav .sb-sidenav-menu .nav .nav-link {
+  border-radius: .5rem;
+  margin: 3px 8px;
+  padding: .55rem .85rem;
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  transition: background-color .15s ease, color .15s ease, transform .02s ease;
+  outline: none;
+}
+.sb-sidenav .sb-sidenav-menu .nav .nav-link .sb-nav-link-icon {
+  width: 1.25rem;
+  display: inline-flex;
+  justify-content: center;
+}
+.sb-sidenav .nav-link:hover:not(.active) {
+  background: rgba(255,255,255,.08);
+}
+.sb-sidenav .nav-link.active {
+  background: #4f46e5; /* indigo */
+  color: #fff;
+  box-shadow: 0 0 0 1px rgba(255,255,255,.15) inset;
+}
+.sb-sidenav .nav-link.active i { color: #fff; }
+.sb-sidenav .nav-link:focus-visible,
+.feedback-btn:focus-visible {
+  outline: 3px solid #93c5fd; /* blue-300 */
+  outline-offset: 2px;
+}
+.sb-sidenav .sb-sidenav-menu-heading {
+  font-size: .75rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  opacity: .7;
+  margin: 10px 12px 4px;
+}
+
+/* Floating feedback button */
+.feedback-btn {
+  position: fixed;
+  right: 18px;
+  bottom: 20px;
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #4f46e5;
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(0,0,0,.25);
+  cursor: pointer;
+  z-index: 1080; /* above backdrop */
+}
+.feedback-btn:hover { filter: brightness(1.05); transform: translateY(-1px); }
+
+/* Breadcrumb spacing */
+.breadcrumb { --bs-breadcrumb-margin-bottom: 0; }
+
+/* Footer subtle glass effect (still light/dark friendly) */
+footer.bg-light {
+  background-color: rgba(248,249,250,.85) !important;
+  backdrop-filter: saturate(1.1) blur(2px);
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .sb-sidenav .nav-link,
+  .feedback-btn { transition: none; }
+}
+/* Footer container styling */
+.sb-sidenav-footer.user-footer {
+  background-color: rgba(255,255,255,0.05);
+  padding: 0.75rem 1rem;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+/* User info layout */
+.user-info {
+  display: flex;
+  align-items: center;
+}
+
+/* Avatar/icon */
+.user-avatar {
+  font-size: 1.6rem;
+  color: #93c5fd; /* light blue */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Name text */
+.user-text .small {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+.user-text .fw-semibold {
+  font-size: 0.85rem;
+  color: #fff;
+  max-width: 140px; /* prevent overflow */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Sidebar footer styling */
+.sb-sidenav-footer.user-footer {
+  background-color: rgba(255,255,255,0.05);
+  padding: 0.75rem 1rem;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+}
+
+.user-avatar .avatar-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.user-text .small {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+.user-text .fw-semibold {
+  font-size: 0.85rem;
+  color: #fff;
+  max-width: 140px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Dropdown header */
+.dropdown-header {
+  padding: 0.5rem 1rem;
+  background-color: rgba(0,0,0,0.03);
+  border-radius: 0.375rem;
+}
+
+/* Menu hover effect */
+.dropdown-item {
+  border-radius: 0.375rem;
+  transition: background-color 0.15s ease;
+}
+.dropdown-item:hover {
+  background-color: rgba(0,0,0,0.05);
+}
+/* 1) Kill Bootstrap's default caret so it doesn't shift baseline */
+.navbar-nav .dropdown-toggle::after { display: none !important; }
+
+/* 2) Make toggles true flex rows with consistent height/baseline */
+.navbar-nav .nav-item .nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  line-height: 1;          /* same baseline for icons & text */
+  min-height: 40px;        /* equal click target for both */
+  padding-top: .4rem;
+  padding-bottom: .4rem;
+}
+
+/* 3) Normalize icon metrics across BI and FA */
+.navbar-nav .nav-link .bi,
+.navbar-nav .nav-link .fas,
+.navbar-nav .nav-link .fa-solid {
+  font-size: 1.25rem;      /* make both the same size */
+  line-height: 1;
+  vertical-align: middle;
+  display: inline-block;
+}
+
+/* Tiny nudge: Font Awesome usually sits a hair low vs BI */
+.navbar-nav .nav-link .fas,
+.navbar-nav .nav-link .fa-solid {
+  position: relative;
+  top: -1px;               /* adjust -1px to taste (0 to -2px) */
+}
+
+/* Optional: custom caret if you add one later */
+.navbar-nav .nav-link .custom-caret {
+  font-size: .65rem;
+  opacity: .7;
+  line-height: 1;
+  position: relative;
+  top: -1px;
+}
+
+/* 4) Badge should not change link height */
+.navbar-nav .nav-link.position-relative .notif-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(35%,-35%);
+  line-height: 1;
+  font-size: .65rem;
+  padding: 2px 5px;
+  border-radius: 999px;
+}

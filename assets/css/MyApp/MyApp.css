@@ -1,0 +1,244 @@
+:root{
+  --teal-600:#0f766e; --teal-100:#ccfbf1;
+}
+.bg-teal-subtle{ background:var(--teal-100)!important; }
+.text-teal-emphasis{ color:var(--teal-600)!important; }
+
+/* ------- Card & header ------- */
+.page-card{
+  border:0; border-radius:1rem;
+  /* IMPORTANT: allow the inner table scroller to work on real phones */
+  overflow: visible;
+  box-shadow:0 16px 40px rgba(16,24,40,.06);
+}
+.page-head{
+  background:#111827; color:#fff; padding:1rem 1.25rem;
+  border-top-left-radius:1rem; border-top-right-radius:1rem;
+}
+.page-head h4{ margin:0; font-weight:700; }
+.subtle{ color:rgba(255,255,255,.65); font-size:.9rem; }
+
+/* filters on the right */
+.page-head .d-flex.gap-2{ flex-wrap:wrap; }
+.page-head .form-control-sm,
+.page-head .form-select-sm{ min-width:180px; }
+
+/* ------- Desktop/table ------- */
+.table-wrapper .table-responsive{
+  overflow-x:auto;                 /* enable horizontal scroll */
+  -webkit-overflow-scrolling:touch;/* momentum on iOS */
+}
+.table-wrapper .table{
+  min-width: 820px;                /* force real scroll on narrow screens */
+  border-collapse:separate; border-spacing:0;
+}
+.table thead th{ font-weight:600; white-space:nowrap; }
+.copyable{ cursor:pointer; }
+.dot{
+  display:inline-block; width:.5rem; height:.5rem; border-radius:50%;
+  margin-right:.35rem; background:currentColor; vertical-align:middle;
+}
+
+/* ------- Mobile cards ------- */
+@media (max-width: 992px){
+  /* hide desktop table on <lg and show cards */
+  .table-wrapper{ display:none!important; }
+}
+@media (max-width: 640px){
+  .appt-card{
+    border:1px solid rgba(0,0,0,.06);
+    border-radius:.9rem; padding:1rem; margin-bottom:.75rem; background:#fff;
+  }
+  .appt-row{
+    display:flex; justify-content:space-between; align-items:center; gap:.75rem;
+  }
+  .appt-row + .appt-row{ margin-top:.6rem; }
+  .label{ color:#6b7280; font-size:.85rem; }
+}
+
+/* ------- Empty state ------- */
+.empty{ text-align:center; padding:3rem 1rem; color:#6b7280; }
+
+/* ------- Example badge helpers (optional) ------- */
+.badge.rounded-pill{ font-weight:600; }
+.appt-card{
+  position:relative;
+  background:#fff;
+  border:1px solid rgba(0,0,0,.06);
+  border-radius:1rem;
+  padding:1rem 1rem 1.1rem;
+  margin-bottom:.9rem;
+  box-shadow: 0 8px 22px rgba(16,24,40,.05);
+  overflow:hidden; /* keeps chip neatly inside */
+}
+
+/* certificate chip in the corner */
+.cert-chip{
+  position:absolute; top:.75rem; right:.75rem;
+  border-radius:999px; padding:.35rem .8rem;
+  font-weight:600; font-size:.8rem; white-space:nowrap;
+  max-width:55%; text-overflow:ellipsis; overflow:hidden;
+}
+
+/* header: tracking */
+.trk{ padding-right:36%; } /* room for the chip */
+.trk-label{
+  font-size:.78rem; letter-spacing:.02em; text-transform:uppercase;
+  color:#6b7280; margin-bottom:.2rem;
+}
+.trk-value{
+  font-weight:700; font-size:1.02rem; line-height:1.2;
+  word-break:break-word;
+}
+
+/* 2×2 grid of facts */
+.meta-grid{
+  display:grid; grid-template-columns:1fr 1fr; gap:.6rem .9rem;
+  margin-top:.9rem;
+}
+.meta .label{ color:#6b7280; font-size:.85rem; }
+.meta .value{ font-weight:600; }
+
+/* status dot reused */
+.dot{
+  display:inline-block; width:.5rem; height:.5rem; border-radius:50%;
+  margin-right:.35rem; background:currentColor; vertical-align:middle;
+}
+
+/* keep table for ≥ lg only (already in your code) */
+@media (min-width: 992px){
+  #listMobile{ display:none!important; }
+}
+
+/* small screens: stack grid to single column if super narrow */
+@media (max-width: 380px){
+  .meta-grid{ grid-template-columns:1fr; }
+  .trk{ padding-right:42%; }
+}
+/* Key : Value layout for mobile cards */
+.kv{
+  list-style:none; padding:0; margin:0;
+  display:flex; flex-direction:column; gap:.5rem;
+}
+.kv-row{
+  display:grid;
+  grid-template-columns: 155px 12px 1fr; /* key | : | value */
+  align-items:baseline;
+  column-gap:.35rem;
+}
+@media (max-width:400px){
+  .kv-row{ grid-template-columns: 135px 10px 1fr; }
+}
+.kv-key{
+  color:#6b7280; font-weight:600; font-size:.92rem; letter-spacing:.01em;
+}
+.kv-sep{ color:#9ca3af; text-align:center; }
+.kv-val{ color:#111827; font-weight:600; word-break:break-word; }
+.kv-val .badge{ vertical-align:middle; }
+.kv-val .copyable{ text-decoration:none; border-bottom:1px dotted #9ca3af; }
+/* Let value column wrap and not overflow */
+.kv-row{
+  align-items:start;
+  grid-template-columns: 155px 12px minmax(0,1fr);
+}
+.kv-row > .kv-val{ min-width:0; display:block; }
+
+/* Allow badges to wrap (Bootstrap badges are nowrap by default) */
+.kv-val .badge{
+  white-space: normal;          /* <— key change */
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  line-height: 1.1;
+}
+
+/* On small screens, stack specific rows (Certificate, Status) */
+@media (max-width: 430px){
+  .kv-row.kv-wrap{
+    grid-template-columns: 1fr;   /* single column */
+  }
+  .kv-row.kv-wrap .kv-key{
+    grid-column: 1;
+  }
+  .kv-row.kv-wrap .kv-sep{
+    display: none;                /* hide ':' row when stacked */
+  }
+  .kv-row.kv-wrap .kv-val{
+    grid-column: 1;
+    margin-top: .2rem;            /* small gap under label */
+  }
+}
+
+/* Very narrow phones: slightly smaller key column when not stacked */
+@media (max-width: 380px){
+  .kv-row{ grid-template-columns: 135px 10px minmax(0,1fr); }
+}
+
+
+.tracker {
+  display:flex;
+  align-items:flex-start; /* align top of bar with circles */
+  gap:10px;
+}
+
+/* Steps with label */
+.tracker .step {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  width:60px; /* enough for text */
+  flex-shrink:0;
+  text-align:center;
+}
+
+.tracker .step i {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  background:#e9ecef;
+  color:#6c757d;
+  font-size:18px;
+  margin-bottom:6px;
+}
+
+.tracker .step .label {
+  font-size:12px;
+  line-height:1.2;
+  color:#6c757d;
+  word-wrap:break-word;
+}
+
+/* Active/done/rejected states */
+.tracker .step.active i { background:#0d6efd; color:#fff; }
+.tracker .step.done i { background:#198754; color:#fff; }
+.tracker .step.rejected i { background:#dc3545; color:#fff; }
+
+/* Bars */
+.tracker .bar {
+  flex:1;
+  height:6px;
+  margin-top:18px; /* align with circle centers */
+  background:#e9ecef;
+  border-radius:4px;
+}
+.tracker .bar.filled { background:#198754; }
+
+@media (max-width:480px){
+  .tracker .step {
+    width:50px;
+  }
+  .tracker .step i {
+    width:28px;
+    height:28px;
+    font-size:14px;
+  }
+  .tracker .step .label {
+    font-size:10px;
+  }
+}
+
+

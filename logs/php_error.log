@@ -1,0 +1,5 @@
+[29-Aug-2025 07:14:16 UTC] PHP Fatal error:  Uncaught ArgumentCountError: The number of elements in the type definition string must match the number of bind variables in /home/hzvl0mk3xdsn/public_html/office.bugoportal.site/class/update_resident.php:258
+Stack trace:
+#0 /home/hzvl0mk3xdsn/public_html/office.bugoportal.site/class/update_resident.php(258): mysqli_stmt->bind_param()
+#1 {main}
+  thrown in /home/hzvl0mk3xdsn/public_html/office.bugoportal.site/class/update_resident.php on line 258

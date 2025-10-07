@@ -1,0 +1,112 @@
+  :root{
+      --bg:#0e1220;
+      --card:#ffffff;
+      --muted:#6c757d;
+      --primary:#0d6efd;
+      --ring:rgba(13,110,253,.25);
+    }
+    html { scroll-behavior:smooth; }
+body{
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+
+  /* layered backgrounds: 2 soft gradients on top of the image */
+  background-image:
+    radial-gradient(1200px 600px at 10% -10%, #e7f0ff 0%, transparent 60%),
+    radial-gradient(900px 500px at 110% 10%, #fff0f5 0%, transparent 55%),
+    url("bugo-resident-side/assets/logo/bugo.png");
+  background-position:
+    10% -10%,
+    110% 10%,
+    center;
+  background-size:
+    1200px 600px,
+    900px 500px,
+    cover;
+  background-repeat:
+    no-repeat,
+    no-repeat,
+    no-repeat;
+  background-attachment:
+    scroll,
+    scroll,
+    fixed; /* keeps the PNG static while scrolling */
+  background-color: #fff; /* fallback color */
+}
+
+    .section-title{ font-weight:800; letter-spacing:.2px; }
+
+    /* Hero */
+    .hero{
+      background: linear-gradient(135deg, rgba(13,110,253,.08), rgba(25,135,84,.08));
+      border-bottom:1px solid rgba(0,0,0,.06);
+    }
+    .hero .display-5{ line-height:1.15; }
+
+    /* Cards */
+    .card, .stat-card, .official-card{
+      background:var(--card);
+      border-radius:1rem;
+      border:1px solid rgba(0,0,0,.06);
+      box-shadow:0 6px 24px rgba(16,24,40,.06);
+      transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    }
+    .card:hover, .stat-card:hover, .official-card:hover{
+      transform: translateY(-4px);
+      box-shadow:0 14px 40px rgba(16,24,40,.12);
+      border-color: rgba(13,110,253,.15);
+    }
+
+    .stat-card{ border-left:5px solid var(--primary); }
+    .icon-box{ font-size:2rem; }
+
+    /* Focus ring */
+    .btn:focus, .form-control:focus, .accordion-button:focus{
+      box-shadow:0 0 0 .25rem var(--ring)!important;
+    }
+
+    /* News scroller */
+    #newsScroll{
+      scroll-snap-type:x mandatory;
+      -webkit-overflow-scrolling:touch;
+      padding-bottom:.25rem;
+    }
+    .news-card{ scroll-snap-align:start; border-radius:1rem; overflow:hidden; }
+    .news-card img{ transition: transform .6s ease; }
+    .news-card:hover img{ transform: scale(1.03); }
+
+    /* Clamp */
+    /* .line-clamp-3{
+      display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
+    } */
+
+    /* Carousel icons */
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon{ filter: invert(1); }
+
+    /* Accordion */
+    .accordion-button::after{ transition: transform .2s ease; }
+    .accordion-button:not(.collapsed)::after{ transform: rotate(180deg); }
+    .accordion-item{ border:1px solid rgba(0,0,0,.06); border-radius:.75rem; overflow:hidden; }
+    .accordion-button{ background:#fff; }
+
+    /* Soft button */
+    .btn-soft-primary{ background:rgba(13,110,253,.1); color:#0b5ed7; border:1px solid rgba(13,110,253,.15); }
+    .btn-soft-primary:hover{ background:rgba(13,110,253,.16); }
+    .btn{ transition: transform .15s ease; }
+    .btn:hover{ transform: translateY(-1px); }
+
+    /* Reveal on scroll */
+    .reveal{ opacity:0; transform:translateY(12px); transition:opacity .5s ease, transform .5s ease; }
+    .reveal.show{ opacity:1; transform:none; }
+
+    @media (prefers-reduced-motion: reduce){
+      *{ transition:none !important; animation:none !important; scroll-behavior:auto; }
+    }
+
+    .modal-elevated { box-shadow: 0 24px 64px rgba(16,24,40,.18); }
+    .modal-hero img.object-cover { width:100%; height:100%; object-fit:cover; }
+    .modal-content .badge { font-weight:600; }
+    .rounded-top-4 { border-top-left-radius:1rem!important; border-top-right-radius:1rem!important; }
+
+    /* Softer backdrop + slight blur */
+    .modal-backdrop.show { opacity:.25; backdrop-filter: blur(2px); }

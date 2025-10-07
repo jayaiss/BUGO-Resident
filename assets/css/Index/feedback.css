@@ -1,0 +1,34 @@
+/* Star rating: hover + selected highlight */
+.rating{
+  display:inline-flex;
+  flex-direction: row-reverse;      /* so ~ selects “previous” stars */
+  gap:.25rem;
+}
+.rating input{ display:none; }
+
+.rating label{
+  font-size:1.6rem;
+  line-height:1;
+  cursor:pointer;
+  color:#ced4da;                     /* unselected (Bootstrap gray-400) */
+  transition: transform .08s ease, color .12s ease;
+  user-select:none;
+}
+
+/* highlight on hover */
+.rating label:hover,
+.rating label:hover ~ label{
+  color:#ffc107;                     /* Bootstrap warning (gold) */
+  transform: scale(1.06);
+}
+
+/* keep highlight when selected */
+.rating input:checked ~ label{
+  color:#ffc107;
+}
+
+/* keyboard focus ring */
+.rating input:focus + label{
+  outline:2px solid #86b7fe;
+  outline-offset:2px;
+}

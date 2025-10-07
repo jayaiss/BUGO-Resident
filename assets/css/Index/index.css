@@ -1,0 +1,159 @@
+/* ===== Layout / Z-index fixes ===== */
+.sb-topnav { z-index: 1060 !important; position: sticky; top: 0; }
+.dropdown-menu { z-index: 1059 !important; }
+.modal-backdrop.show { background-color: rgba(0,0,0,.45) !important; backdrop-filter: blur(2px); }
+
+/* ===== Marquee (announcements) ===== */
+.marquee-container {
+  overflow: hidden; white-space: nowrap;
+  background: #0b0f1a; color: #fff; height: 36px;
+  display: flex; align-items: center; gap: 1rem;
+  position: absolute; top: 50%; transform: translateY(-50%);
+  left: 290px; right: 160px; font-size: 14px; padding: 0 .75rem; border-radius: 6px;
+  opacity: .95;
+}
+.marquee-text {
+  display:inline-block; white-space:nowrap; padding-left:100%;
+  animation: marquee-scroll 30s linear infinite;
+}
+@keyframes marquee-scroll { 0%{transform:translateX(0)} 100%{transform:translateX(-100%)} }
+@media (max-width: 992px){ .marquee-container{ display:none; } }
+@media (prefers-reduced-motion: reduce){ .marquee-text{ animation: none; padding-left: 0;} }
+
+/* ===== Notification bell & badge ===== */
+.nav-link .bi-bell { vertical-align: -2px; }
+.notif-badge {
+  position:absolute; top: 8px; right: 2px; transform: translate(50%,-50%);
+  background: #ff3b30; color:#fff; font-size:11px; padding: 3px 6px; border-radius:999px;
+  line-height:1; box-shadow: 0 0 0 2px #fff; animation:pulse 1.8s infinite;
+}
+@keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(255,59,48,.6)} 70%{box-shadow:0 0 0 12px rgba(255,59,48,0)} 100%{box-shadow:0 0 0 0 rgba(255,59,48,0)} }
+
+.notif-dropdown {
+  width: 360px; max-height: 70vh; overflow:auto; border-radius:12px;
+  background: #fff; border: 1px solid #e5e7eb;
+}
+@media (max-width: 420px){ .notif-dropdown{ width: calc(100vw - 2rem); } }
+
+/* ===== Notification card (light) ===== */
+.notif-item {
+  background: #ffffff;
+  color: #333;
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 10px;
+  padding: 12px;
+  margin: 8px 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+.notif-item:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+  cursor: pointer;
+}
+.notif-item .fw-bold { color: #1e293b; font-size: 14px; }
+.notif-item .small { font-size: 13px; color: #555; }
+
+/* Status labels */
+.notif-status {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 12px;
+}
+.notif-status.approved        { background: #d1fae5; color: #065f46; }
+.notif-status.released        { background: #dbeafe; color: #1e3a8a; }
+.notif-status.rejected        { background: #fee2e2; color: #991b1b; }
+.notif-status.pending         { background: #fef9c3; color: #92400e; }
+.notif-status.approvedcaptain { background: #e0e7ff; color: #3730a3; }
+
+/* Delete button */
+.delete-notif-btn {
+  color: #dc2626;
+  border: none;
+  background: transparent;
+}
+.delete-notif-btn:hover {
+  background: #fee2e2;
+  border-radius: 50%;
+}
+
+/* Scrollable list in "See all" modal */
+.scrollable-notif-list {
+  max-height: 60vh;
+  overflow: auto;
+}
+.list-group-item.notif-item {
+  background: #fff;
+  color: #333;
+  border-color: #e0e0e0;
+}
+
+/* ===== Feedback button ===== */
+.feedback-btn {
+  position: fixed; bottom: 75px; right: 20px; z-index: 1061;
+  background: linear-gradient(135deg, #ff6f61, #ff3b3b);
+  color: #fff; border: none; padding: 15px; border-radius: 50%;
+  cursor: pointer; box-shadow: 0 8px 20px rgba(0,0,0,.25);
+  transition: transform .15s ease, filter .2s ease;
+}
+.feedback-btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
+.feedback-btn:active { transform: translateY(0); }
+
+/* Tooltip */
+.tooltip-inner {
+  background: #0b0f1a; color:#fff; border:1px solid rgba(255,255,255,.1);
+}
+
+/* ===== Modals polish ===== */
+.modal-header.bg-success,
+.modal-header.bg-info,
+.modal-header.bg-primary,
+.modal-header.bg-danger,
+.modal-header.bg-warning {
+  border-top-left-radius: .6rem; border-top-right-radius: .6rem;
+}
+.modal-content { border-radius: .6rem; overflow: hidden; }
+
+/* ===== Accessibility focus ===== */
+:focus-visible {
+  outline: 2px solid #6ea8fe; outline-offset: 2px;
+}
+
+/* ===== Buttons micro style ===== */
+.btn-link.small {
+  color: #6ea8fe; text-decoration: none;
+}
+.btn-link.small:hover { text-decoration: underline; }
+
+/* ===== Footer ===== */
+footer a { color:#6ea8fe; }
+footer a:hover { color:#a9c8ff; }
+
+.notif-modal-position {
+    transform: translateY(40px); /* pushes it down */
+}
+
+.notif-modal-position.modal-dialog-centered {
+    align-items: unset !important; /* disable Bootstrap vertical center */
+}
+#allNotifModal { 
+  --bs-modal-margin: 6rem; /* try 5–7rem; adjusts top & bottom spacing */
+}
+
+/* Hard override in case something else wins the cascade */
+#allNotifModal .modal-dialog {
+  margin: 6rem auto 1.25rem !important; /* top, horizontal auto, bottom */
+}
+
+/* OPTIONAL: smooth slide-in feel */
+#allNotifModal .modal-dialog {
+  transform: translateY(-8px);
+  transition: transform .18s ease, margin .18s ease;
+}
+#allNotifModal.show .modal-dialog {
+  transform: translateY(0);
+}
+#bugo-map .card { border-radius: 0.75rem; }
+#bugo-map .card iframe { border: 0; }

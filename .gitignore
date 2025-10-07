@@ -1,0 +1,4 @@
+.env
+.env.*
+!.env.user
+storage/app_version.txt

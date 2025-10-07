@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Service Temporarily Unavailable</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" type="image/png" href="/bugo-resident-side/assets/logo/logo.png">
+  <meta name="robots" content="noindex,nofollow">
+  <!-- Optional auto-retry after 20s -->
+  <meta http-equiv="refresh" content="20">
+  <!-- Tight but permissive enough for this static page -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'unsafe-inline';">
+  <style>
+    :root{
+      --bg:#0b121a; --card:#111923; --border:#1f2a36; --text:#e8eef5; --mut:#9fb0c5; --btn:#2a63ff; --btnh:#2f7a1a;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; display:grid; place-items:center; background:var(--bg); color:var(--text);
+      font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    }
+    .card{
+      width:min(560px,92vw);
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:32px 28px;
+      box-shadow:0 10px 24px rgba(0,0,0,.25);
+      text-align:center;
+    }
+    h1{font-size:22px; margin:0 0 8px}
+    p{margin:0 0 14px; color:var(--mut)}
+    .actions{display:flex; gap:12px; justify-content:center; margin-top:16px; flex-wrap:wrap}
+    a.btn{
+      display:inline-block; text-decoration:none; color:#fff; background:var(--btn);
+      padding:10px 16px; border-radius:10px; font-weight:600
+    }
+    a.btn.secondary{background:transparent; border:1px solid var(--border); color:var(--text)}
+    .note{margin-top:18px; font-size:13px; color:#7f8ea3}
+    .emoji{font-size:28px; margin-bottom:8px}
+    @media (hover:hover){ a.btn:hover{filter:brightness(1.05)} a.btn.secondary:hover{background:#0e1520} }
+  </style>
+</head>
+<body>
+  <main class="card" role="main" aria-labelledby="h">
+    <div class="emoji" aria-hidden="true">🛠️</div>
+    <h1 id="h">We’re doing a quick tune-up</h1>
+    <p>The service is temporarily unavailable. Please try again in a moment.</p>
+    <div class="actions">
+      <a class="btn" href="javascript:location.reload()">Try again</a>
+    </div>
+    <p class="note">If this keeps happening, contact support and include the time of the issue.</p>
+         <p class="note">Need help? <a href="mailto:jayacop9@gmail.com">jayacop9@gmail.com</a></p>
+   
+  </main>
+</body>
+</html>

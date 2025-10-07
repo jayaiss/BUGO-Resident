@@ -1,0 +1,121 @@
+/* Shell / header */
+body{ background:#f5f7fb; }
+.page-card{ border:0; border-radius:1rem; overflow:hidden; box-shadow:0 16px 40px rgba(16,24,40,.06); }
+.page-head{ background:#111827; color:#fff; padding:1rem 1.25rem; }
+.page-head h4{ margin:0; font-weight:700; }
+.subtle{ color:rgba(255,255,255,.65); font-size:.9rem; }
+
+/* Filters */
+.filters{ gap:.5rem; }
+.filters .form-control, .filters .form-select{ min-width:170px; }
+
+/* Table (desktop) */
+.table thead th{ font-size:.8rem; letter-spacing:.03em; font-weight:600; }
+.badge-round{ border-radius:1rem; }
+
+/* Copy helper (default look everywhere) */
+.copyable{ cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px; }
+
+/* Empty state */
+.empty{ text-align:center; padding:3rem 1rem; color:#6b7280; }
+
+/* Clear button */
+#clearFilters{
+  display:inline-flex; align-items:center; gap:4px;
+  padding:.35rem .75rem; font-size:.85rem; font-weight:500;
+  border-radius:50px; border:1px solid #d1d5db;
+  background-color:#f9fafb; color:#374151;
+  transition:all .2s ease-in-out;
+}
+#clearFilters i{ font-size:1rem; }
+#clearFilters:hover{ background-color:#f3f4f6; border-color:#9ca3af; color:#111827; }
+#clearFilters:disabled{ opacity:.5; cursor:not-allowed; }
+
+/* ---------- Mobile cards (formal key:value layout) ---------- */
+
+/* Card shell */
+.event-card{
+  border:1px solid rgba(0,0,0,.06);
+  border-radius:1rem;
+  background:#fff;
+  box-shadow:0 8px 24px rgba(16,24,40,.06);
+  padding:1rem;
+  margin-bottom:.9rem;
+}
+
+/* Key : value list */
+.kv{
+  list-style:none; padding:0; margin:0;
+  display:flex; flex-direction:column; gap:.5rem; /* space between rows */
+}
+
+/* three columns: key | : | value (aligns colon neatly) */
+.kv-row{
+  display:grid;
+  grid-template-columns:96px 12px 1fr;
+  align-items:baseline;
+  column-gap:.25rem;
+}
+
+/* Typography */
+.kv-key{
+  color:#6b7280; font-weight:600; font-size:.92rem; letter-spacing:.01em;
+}
+.kv-sep{ color:#9ca3af; text-align:center; }
+.kv-val{ color:#111827; font-weight:600; word-break:break-word; }
+
+/* badge looks tidy inline */
+.kv-val .badge{ vertical-align:middle; }
+
+/* Location keeps copy handler but looks formal only inside kv */
+.kv-val .copyable{ text-decoration:none; border-bottom:1px dotted #9ca3af; }
+
+/* ---- Details: collapse/expand (replaces the old clamp rule) ---- */
+.desc{
+  /* Standard property (Chromium, Safari, newer Firefox) */
+  line-clamp: 3;
+
+  /* WebKit/Blink fallback for broad support */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+
+  overflow: hidden;
+}
+.desc.is-expanded{
+  line-clamp: unset;
+  -webkit-line-clamp: unset;
+  display: block;
+}
+
+/* See more / See less button */
+.see-more{
+  background:transparent;
+  border:0;
+  padding:0;
+  margin-top:.25rem;
+  font-size:.88rem;
+  color:#0d6efd;
+  text-decoration:underline;
+  cursor:pointer;
+}
+.see-more:focus-visible{
+  outline:2px solid rgba(13,110,253,.5);
+  outline-offset:2px;
+}
+
+/* ---------- Responsive tweaks ---------- */
+@media (max-width:768px){
+  .table-wrapper{ display:none; } /* hide desktop table on mobile */
+  /* Old .row-line/.label kept for backward compatibility, safe to remove if unused */
+  .row-line{ display:flex; justify-content:space-between; gap:.5rem; }
+  .row-line + .row-line{ margin-top:.5rem; }
+  .label{ color:#6b7280; font-size:.86rem; }
+}
+
+/* Desktop table: keep description compact */
+@media (min-width:768px){
+  .table td:nth-child(2){
+    max-width:420px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+}

@@ -1,0 +1,2 @@
+[28-Aug-2025 17:42:13 UTC] PHP Warning:  include(class/session_timeout.php): Failed to open stream: No such file or directory in /home/hzvl0mk3xdsn/public_html/bugoportal.site/api/resident_appointment.php on line 17
+[28-Aug-2025 17:42:13 UTC] PHP Warning:  include(): Failed opening 'class/session_timeout.php' for inclusion (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home/hzvl0mk3xdsn/public_html/bugoportal.site/api/resident_appointment.php on line 17

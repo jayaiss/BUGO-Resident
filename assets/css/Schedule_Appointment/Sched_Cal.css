@@ -1,0 +1,198 @@
+ /* Shell */
+  .scheduler-wrap { max-width: 980px; margin: 0 auto; }
+
+  /* Calendar grid (assumes your container uses #calendar) */
+  #calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: .75rem;
+  }
+
+  /* Day cells */
+  .day{
+    min-height: 78px;
+    border-radius: .85rem;
+    border: 1px solid rgba(16,24,40,.1);
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(16,24,40,.05);
+    padding: .6rem .65rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease;
+    position: relative;
+    user-select: none;
+  }
+  .day.hover-effect:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(16,24,40,.12);
+    border-color: rgba(13,110,253,.25);
+    cursor: pointer;
+  }
+
+  /* Date number */
+  .day > div:first-child{
+    font-weight: 700;
+    font-size: 1rem;
+    color: #111827;
+  }
+
+  /* Today ring */
+  .day.today-indicator::after{
+    content:"Today";
+    position:absolute; top:.45rem; right:.55rem;
+    font-size:.675rem; font-weight:700;
+    color:#0d6efd; background:rgba(13,110,253,.12);
+    border:1px solid rgba(13,110,253,.25);
+    border-radius: 999px; padding:.12rem .45rem;
+  }
+
+  /* Selected state */
+  .day.selected{
+    outline: 3px solid rgba(13,110,253,.2);
+    border-color:#0d6efd;
+    box-shadow: 0 6px 18px rgba(13,110,253,.25);
+  }
+
+  /* Disabled / past / weekends */
+  .day.disabled{
+    background: #f8f9fb;
+    color: #9aa3af !important;
+    border-style: dashed;
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+  .day.disabled.hover-effect:hover{ transform:none; box-shadow:none; }
+
+  /* Fully booked ribbon */
+  .day.fully-booked{
+    background: #fff5f6 !important;
+    border: 1px solid #e11d48 !important; /* rose-600 */
+    color: #b91c1c !important;
+    cursor: not-allowed;
+  }
+  .day.fully-booked::before{
+    content:"FULL";
+    position:absolute; top:.55rem; left:.55rem;
+    font-size:.65rem; font-weight:800; letter-spacing:.03em;
+    color:#b91c1c; background:#fde2e7; border:1px solid #f5b7c2;
+    border-radius:6px; padding:.05rem .35rem;
+  }
+  .day .text-danger.small{ margin-top:.25rem; font-weight:600; }
+
+  /* Header controls (Previous / Next) */
+  .btn-nav{
+    background:#fff; border:1px solid rgba(16,24,40,.12);
+    border-radius:.75rem; padding:.45rem .7rem; font-weight:600;
+    transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+  }
+  .btn-nav:hover{ transform:translateY(-1px); box-shadow:0 6px 16px rgba(16,24,40,.12); border-color:rgba(13,110,253,.25); }
+
+  /* Legend */
+  .calendar-legend{
+    display:flex; gap:.75rem; align-items:center; flex-wrap:wrap; margin:.75rem 0 1rem;
+  }
+  .legend-pill{
+    display:inline-flex; align-items:center; gap:.45rem; padding:.25rem .55rem;
+    border-radius:999px; border:1px solid rgba(16,24,40,.12);
+    background:#fff; font-size:.8rem;
+  }
+  .legend-dot{ width:.65rem; height:.65rem; border-radius:50%; display:inline-block; }
+  .dot-available{ background:#16a34a; }
+  .dot-today{ background:#0d6efd; }
+  .dot-disabled{ background:#9aa3af; }
+  .dot-full{ background:#e11d48; }
+
+  /* Time slots */
+  #timeSlotsSection{ margin-top:1rem; }
+  .time-slot{
+    background:#fff; border:1px solid rgba(16,24,40,.1);
+    padding:.65rem .75rem; border-radius:.85rem; margin-bottom:.55rem;
+    display:flex; justify-content:space-between; align-items:center;
+    transition: border-color .12s ease, box-shadow .12s ease;
+  }
+  .time-slot:hover{ border-color:rgba(13,110,253,.25); box-shadow:0 6px 16px rgba(16,24,40,.12); }
+  .time-slot span{ font-weight:600; color:#111827; }
+
+  /* Time slot buttons */
+  .btn-select{
+    background:#0d6efd; color:#fff; border:1px solid #0d6efd; border-radius:.7rem;
+    padding:.4rem .8rem; font-weight:700;
+  }
+  .btn-select:hover{ filter: brightness(1.05); }
+  .btn-full{
+    background:#f3f4f6; color:#6b7280; border:1px dashed rgba(16,24,40,.2); border-radius:.7rem;
+    padding:.4rem .8rem; font-weight:700;
+  }
+  .btn-danger{ border-radius:.7rem; }
+
+  /* Loading skeletons */
+  .skeleton-line{
+    height: 14px; width: 100%;
+    background: linear-gradient(90deg, #f2f4f7 25%, #e6e9ee 37%, #f2f4f7 63%);
+    background-size: 400% 100%;
+    animation: skeleton 1.2s ease-in-out infinite;
+    border-radius:6px;
+  }
+  .skeleton-line + .skeleton-line{ margin-top:.5rem; }
+  @keyframes skeleton { 0%{background-position:100% 50%} 100%{background-position:0 50%} }
+
+  /* Focus ring for keyboard nav */
+  .day:focus-visible, .btn-select:focus-visible, .btn-nav:focus-visible{
+    outline: 3px solid rgba(13,110,253,.35);
+    outline-offset: 2px;
+  }
+  .appointment-choice {
+  border-radius: 1rem;
+  box-shadow: 0 24px 64px rgba(16,24,40,.18);
+  border: 1px solid rgba(16,24,40,.10);
+}
+/* --- Mobile tweaks: hide ribbons + shrink pills --- */
+@media (max-width: 575.98px){       /* ≤ BS sm */
+  /* hide FULL ribbon + Today pill + 'Fully Booked' text */
+  .day.fully-booked::before{ content:none !important; }
+  .day.today-indicator::after{ content:none !important; }
+  .day .text-danger.small{ display:none !important; }
+
+  /* slightly tighter calendar on phones (optional) */
+  #calendar{
+    grid-template-columns: repeat(7, minmax(38px,1fr));
+    gap:.4rem;
+  }
+  .day{ min-height:58px; padding:.45rem .5rem; border-radius:.75rem; }
+}
+/* Phones: hide FULL/TODAY ribbons and the red "Fully Booked" text */
+@media (max-width: 768px), (hover:none) and (pointer:coarse) {
+  .day.fully-booked::before,
+  .day.today-indicator::after {
+    display: none !important;
+    content: "" !important;
+  }
+  .day .text-danger.small{ display: none !important; }
+
+  /* tighten boxes a bit */
+  #calendar{ grid-template-columns: repeat(7, minmax(38px,1fr)); gap:.4rem; }
+  .day{ min-height:58px; padding:.45rem .5rem; border-radius:.75rem; }
+}
+
+/* Fallback: if JS adds .is-mobile to <html>, apply the same hides */
+html.is-mobile .day.fully-booked::before,
+html.is-mobile .day.today-indicator::after{
+  display: none !important;
+  content: "" !important;
+}
+html.is-mobile .day .text-danger.small{ display:none !important; }
+@media (max-width: 768px), (hover:none) and (pointer:coarse){
+  .day.fully-booked::before,
+  .day.today-indicator::after{ display:none !important; content:"" !important; }
+  .day .text-danger.small{ display:none !important; }
+
+  /* a little tighter spacing */
+  #calendar{ grid-template-columns: repeat(7, minmax(38px,1fr)); gap:.4rem; }
+  .day{ min-height:58px; padding:.45rem .5rem; border-radius:.75rem; }
+}
+
+/* Fallback if media query is ignored (e.g., Desktop Site) */
+html.is-mobile .day.fully-booked::before,
+html.is-mobile .day.today-indicator::after{ display:none !important; content:"" !important; }
+html.is-mobile .day .text-danger.small{ display:none !important; }

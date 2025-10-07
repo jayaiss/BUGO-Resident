@@ -1,0 +1,12 @@
+[03-Sep-2025 13:38:23 UTC] PHP Warning:  Undefined variable $stmt in /home/hzvl0mk3xdsn/public_html/bugoportal.site/logs/logs_trig.php on line 302
+[03-Sep-2025 13:38:23 UTC] PHP Fatal error:  Uncaught Error: Call to a member function bind_param() on null in /home/hzvl0mk3xdsn/public_html/bugoportal.site/logs/logs_trig.php:302
+Stack trace:
+#0 /home/hzvl0mk3xdsn/public_html/bugoportal.site/auth/verify_2fa.php(60): Trigger->isLogin()
+#1 {main}
+  thrown in /home/hzvl0mk3xdsn/public_html/bugoportal.site/logs/logs_trig.php on line 302
+[03-Sep-2025 13:38:35 UTC] PHP Warning:  Undefined variable $stmt in /home/hzvl0mk3xdsn/public_html/bugoportal.site/logs/logs_trig.php on line 302
+[03-Sep-2025 13:38:35 UTC] PHP Fatal error:  Uncaught Error: Call to a member function bind_param() on null in /home/hzvl0mk3xdsn/public_html/bugoportal.site/logs/logs_trig.php:302
+Stack trace:
+#0 /home/hzvl0mk3xdsn/public_html/bugoportal.site/auth/verify_2fa.php(60): Trigger->isLogin()
+#1 {main}
+  thrown in /home/hzvl0mk3xdsn/public_html/bugoportal.site/logs/logs_trig.php on line 302

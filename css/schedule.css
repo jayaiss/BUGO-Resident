@@ -1,0 +1,11 @@
+/* Hover effect for calendar days */
+.day.hover-effect:hover {
+    background-color: #e0e0e0;
+    cursor: pointer;
+}
+
+/* Highlight selected date */
+.day.selected {
+    background-color: #007bff;
+    color: white;
+}

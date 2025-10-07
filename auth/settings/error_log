@@ -1,0 +1,16 @@
+[25-Aug-2025 14:51:17 UTC] PW-CHANGE: sending link to jayacop9@gmail.com
+[25-Aug-2025 14:51:17 UTC] PW-CHANGE: trying SMTP SSL 465…
+[25-Aug-2025 14:51:17 UTC] PHP Warning:  Undefined variable $verifyUrl in /home/hzvl0mk3xdsn/public_html/bugoportal.site/auth/settings/settings.php on line 80
+[25-Aug-2025 14:51:24 UTC] PW-CHANGE: sent via 465 SSL
+[25-Aug-2025 14:54:46 UTC] PW-CHANGE: sending link to jayacop9@gmail.com
+[25-Aug-2025 14:54:46 UTC] PW-CHANGE: trying SMTP SSL 465…
+[25-Aug-2025 14:54:46 UTC] PHP Warning:  Undefined variable $verifyUrl in /home/hzvl0mk3xdsn/public_html/bugoportal.site/auth/settings/settings.php on line 80
+[25-Aug-2025 14:54:52 UTC] PW-CHANGE: sent via 465 SSL
+[25-Aug-2025 16:27:00 UTC] PW-CHANGE: sending link to juja.martinez.coc@phinmaed.com
+[25-Aug-2025 16:27:00 UTC] PW-CHANGE: trying SMTP SSL 465…
+[25-Aug-2025 16:27:00 UTC] PHP Warning:  Undefined variable $verifyUrl in /home/hzvl0mk3xdsn/public_html/bugoportal.site/auth/settings/settings.php on line 80
+[25-Aug-2025 16:27:07 UTC] PW-CHANGE: sent via 465 SSL
+[07-Sep-2025 01:46:03 UTC] PW-CHANGE: sending link to jaac.cabulay.coc@phinmaed.com
+[07-Sep-2025 01:46:03 UTC] PW-CHANGE: trying SMTP SSL 465…
+[07-Sep-2025 01:46:03 UTC] PHP Warning:  Undefined variable $verifyUrl in /home/hzvl0mk3xdsn/public_html/bugoportal.site/auth/settings/settings.php on line 81
+[07-Sep-2025 01:46:09 UTC] PW-CHANGE: sent via 465 SSL
