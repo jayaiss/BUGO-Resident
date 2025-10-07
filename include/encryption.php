@@ -1,8 +1,18 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Environment-aware base URL (no trailing slash).
+ * Localhost -> http://localhost/office.bugoportal.site
+ * Prod      -> https://office.bugoportal.site
+ */
+define('OFFICE_BASE_URL', (isset($_SERVER['HTTP_HOST']) && strpos($_SERVER['HTTP_HOST'], 'localhost') !== false)
+    ? 'http://localhost/BUGO-Resident'
+    : 'https://office.bugoportal.site'); // no trailing slash
+
 const ENCRYPTION_KEY = 'thisIsA32ByteLongSecretKey123456'; // 32 bytes
 const INDEX_FILE     = '/index_Admin.php';                 // absolute, correct case
+define('INDEX_URL', OFFICE_BASE_URL . INDEX_FILE);         // full URL to index
 
 // ---- base64url
 function b64u_encode(string $bin): string {
@@ -16,10 +26,10 @@ function b64u_decode(string $b64u): string {
 
 // ---- crypto v2 (GCM) + legacy v1 (CBC)
 function encrypt_v2(string $plaintext, string $key = ENCRYPTION_KEY): string {
-    $k  = hash('sha256', $key, true);
-    $iv = random_bytes(12);
+    $k   = hash('sha256', $key, true);
+    $iv  = random_bytes(12);
     $tag = '';
-    $ct = openssl_encrypt($plaintext, 'aes-256-gcm', $k, OPENSSL_RAW_DATA, $iv, $tag, '');
+    $ct  = openssl_encrypt($plaintext, 'aes-256-gcm', $k, OPENSSL_RAW_DATA, $iv, $tag, '');
     if ($ct === false) throw new RuntimeException('Encrypt failed');
     return 'v2.' . b64u_encode($iv) . '.' . b64u_encode($tag) . '.' . b64u_encode($ct);
 }
@@ -52,19 +62,24 @@ function decrypt(string $token): string|false {
     return decrypt_v1($token); // legacy
 }
 
-// ---- URL builders (root-absolute, no subfolder)
-function enc_page(string $pageName, string $extraQuery = '', string $index = INDEX_FILE): string {
+// ---- URL builders (environment-aware; safe for localhost subfolders)
+function enc_page(string $pageName, string $extraQuery = '', string $index = INDEX_URL): string {
     $url = $index . '?page=' . rawurlencode(encrypt($pageName));
     if ($extraQuery !== '') $url .= '&' . ltrim($extraQuery, '&');
     return $url;
 }
 
-// kept for compatibility; now just calls enc_page()
-function enc_url(string $pageName, string $index = INDEX_FILE): string {
+// kept for compatibility; now just calls enc_page() with full INDEX_URL
+function enc_url(string $pageName, string $index = INDEX_URL): string {
     return enc_page($pageName, '', $index);
 }
 
-// current script (absolute) ?page=...
+// Absolute URL for current script (works on localhost subfolders and prod)
 function enc_self(string $pageName): string {
-    return $_SERVER['SCRIPT_NAME'] . '?page=' . rawurlencode(encrypt($pageName));
+    $https  = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (($_SERVER['SERVER_PORT'] ?? '') === '443');
+    $scheme = $https ? 'https' : 'http';
+    $host   = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $script = $_SERVER['SCRIPT_NAME'] ?? '';
+    $base   = $scheme . '://' . $host . $script;
+    return $base . '?page=' . rawurlencode(encrypt($pageName));
 }
