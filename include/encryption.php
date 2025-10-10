@@ -8,7 +8,7 @@ declare(strict_types=1);
  */
 define('OFFICE_BASE_URL', (isset($_SERVER['HTTP_HOST']) && strpos($_SERVER['HTTP_HOST'], 'localhost') !== false)
     ? 'http://localhost/BUGO-Resident'
-    : 'https://office.bugoportal.site'); // no trailing slash
+    : 'https://bugoportal.site'); // no trailing slash
 
 const ENCRYPTION_KEY = 'thisIsA32ByteLongSecretKey123456'; // 32 bytes
 const INDEX_FILE     = '/index_Admin.php';                 // absolute, correct case

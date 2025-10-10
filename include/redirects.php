@@ -9,8 +9,8 @@ require_once __DIR__ . '/encryption.php';
  */
 if (!defined('OFFICE_BASE_URL')) {
     define('OFFICE_BASE_URL', (isset($_SERVER['HTTP_HOST']) && strpos($_SERVER['HTTP_HOST'], 'localhost') !== false)
-        ? 'http://localhost/office.bugoportal.site'
-        : 'https://office.bugoportal.site'); // no trailing slash
+        ? 'http://localhost/BUGO-Resident'
+        : 'https://bugoportal.site'); // no trailing slash
 }
 if (!defined('INDEX_FILE')) {
     define('INDEX_FILE', '/index_Admin.php'); // absolute, correct case
