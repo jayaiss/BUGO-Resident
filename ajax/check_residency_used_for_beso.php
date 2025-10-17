@@ -3,6 +3,7 @@ session_start();
 header('Content-Type: application/json');
 header('X-Content-Type-Options: nosniff');
 header('X-Frame-Options: DENY');
+
 require_once __DIR__ . '/../include/connection.php';
 $mysqli = db_connection();
 
@@ -18,8 +19,8 @@ if (!isset($_SESSION['id'])) {
 if ($mysqli->connect_error) {
     error_log('Database connection error: ' . $mysqli->connect_error);
     echo json_encode([
-        'used' => false, 
-        'has_beso_record' => false, 
+        'used' => false,
+        'has_beso_record' => false,
         'has_residency_ftj' => false
     ]);
     exit;
@@ -28,13 +29,16 @@ if ($mysqli->connect_error) {
 // --- Validate and sanitize res_id ---
 $resId = isset($_GET['res_id']) ? intval($_GET['res_id']) : 0;
 $response = [
-    'used' => false, 
+    'used' => false,
     'has_beso_record' => false,
     'has_residency_ftj' => false
 ];
 
 if ($resId > 0) {
-    // 1. Residency already USED for BESO?
+
+    /* ===========================================================
+       1) Was a Barangay Residency already USED for BESO?
+    ============================================================ */
     $stmt = $mysqli->prepare("
         SELECT COUNT(*) FROM (
             SELECT barangay_residency_used_for_beso FROM archived_schedules
@@ -61,20 +65,66 @@ if ($resId > 0) {
         $usedCount = 0;
     }
 
-    // 2. Resident has BESO record?
-    $stmt = $mysqli->prepare("SELECT COUNT(*) FROM beso WHERE res_id = ? AND beso_delete_status = 0");
-    if ($stmt) {
-        $stmt->bind_param("i", $resId);
-        $stmt->execute();
-        $stmt->bind_result($besoCount);
-        $stmt->fetch();
-        $stmt->close();
-    } else {
-        error_log('BESO record query failed: ' . $mysqli->error);
-        $besoCount = 0;
+    /* ===========================================================
+       2) Resident has BESO record?
+       (BESO table no longer has res_id; match by name fields.)
+    ============================================================ */
+
+    // Fetch resident's name parts
+    $rfn = $rmn = $rln = $rsuf = '';
+    $rs = $mysqli->prepare("SELECT first_name, middle_name, last_name, suffix_name FROM residents WHERE id = ? LIMIT 1");
+    if ($rs) {
+        $rs->bind_param("i", $resId);
+        $rs->execute();
+        $rs->bind_result($rfn, $rmn, $rln, $rsuf);
+        $rs->fetch();
+        $rs->close();
     }
 
-    // 3. Any Residency (First Time Jobseeker)?
+    $rfn = trim((string)$rfn);
+    $rmn = trim((string)$rmn);
+    $rln = trim((string)$rln);
+    $rsuf = trim((string)$rsuf);
+
+    // Build dynamic WHERE to handle optional middle/suffix (NULL/empty)
+    $sql = "SELECT COUNT(*) FROM beso WHERE beso_delete_status = 0 AND firstName = ? AND lastName = ?";
+    $types = "ss";
+    $binds = [$rfn, $rln];
+
+    if ($rmn !== '') {
+        $sql .= " AND middleName = ?";
+        $types .= "s";
+        $binds[] = $rmn;
+    } else {
+        $sql .= " AND (middleName IS NULL OR middleName = '')";
+    }
+
+    if ($rsuf !== '') {
+        $sql .= " AND suffixName = ?";
+        $types .= "s";
+        $binds[] = $rsuf;
+    } else {
+        $sql .= " AND (suffixName IS NULL OR suffixName = '')";
+    }
+
+    $besoCount = 0;
+    if ($rfn !== '' && $rln !== '') {
+        $bs = $mysqli->prepare($sql);
+        if ($bs) {
+            // bind_param with splat
+            $bs->bind_param($types, ...$binds);
+            $bs->execute();
+            $bs->bind_result($besoCount);
+            $bs->fetch();
+            $bs->close();
+        } else {
+            error_log('BESO name-match query failed: ' . $mysqli->error);
+        }
+    }
+
+    /* ===========================================================
+       3) Any Residency (First Time Jobseeker) records at all?
+    ============================================================ */
     $stmt = $mysqli->prepare("
         SELECT COUNT(*) FROM (
             SELECT 1 FROM schedules
@@ -103,7 +153,7 @@ if ($resId > 0) {
 
     $response = [
         'used'               => isset($usedCount) ? $usedCount > 0 : false,
-        'has_beso_record'    => isset($besoCount) ? $besoCount > 0 : false,
+        'has_beso_record'    => $besoCount > 0,
         'has_residency_ftj'  => isset($residencyFTJCount) ? $residencyFTJCount > 0 : false
     ];
 }

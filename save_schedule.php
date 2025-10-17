@@ -52,6 +52,10 @@ try {
         if (columnExists($db, $table, 'appointment_date'))    return 'appointment_date';
         return ''; // no ORDER BY
     }
+    // ✅ Prefer employee_id if present in session, else fall back to user id
+    function currentUserId(): int {
+        return (int)($_SESSION['employee_id'] ?? $_SESSION['id'] ?? 0);
+    }
 
     /* ----------------------------------------------------------------------
      * Guard clauses
@@ -62,7 +66,7 @@ try {
         exit;
     }
 
-    $loggedInUserId = (int)$_SESSION['id'];
+    $loggedInUserId = (int)$_SESSION['id']; // keep as resident/user id for resident-facing rules
     $isJson         = stripos($_SERVER['CONTENT_TYPE'] ?? '', 'application/json') !== false;
     $data           = $isJson ? json_decode(file_get_contents('php://input'), true) : $_POST;
 
@@ -394,6 +398,7 @@ try {
 
         /* --------------------------------------------------
          *  Additional logic for BESO Application itself
+         *  (UPDATED to match BESO table structure)
          * -------------------------------------------------- */
         if ($certLower === 'beso application') {
             if ($education === '' || $course === '') {
@@ -406,13 +411,13 @@ try {
                 exit;
             }
 
+            // Mark the latest Released Residency(FTJ) as used_for_beso (kept same logic)
             $residencyTables = [
                 'schedules'               => 'appointment_delete_status = 0 AND status = "Released"',
                 'urgent_request'          => 'urgent_delete_status     = 0 AND status = "Released"',
                 'archived_schedules'      => '1',
                 'archived_urgent_request' => '1'
             ];
-
             foreach ($residencyTables as $table => $whereClause) {
                 $residentCol = getResidentColumn($mysqli, $table);
                 if (!$residentCol || !columnExists($mysqli, $table, 'certificate') || !columnExists($mysqli, $table, 'barangay_residency_used_for_beso')) {
@@ -420,7 +425,6 @@ try {
                 }
                 $orderCol = getOrderByColumn($mysqli, $table);
                 $orderSql = $orderCol ? "ORDER BY `$orderCol` DESC" : "";
-
                 $updResSql = "
                     UPDATE `$table`
                     SET barangay_residency_used_for_beso = 1
@@ -439,13 +443,52 @@ try {
                 }
             }
 
+            // ✅ Fetch resident names (since BESO has no res_id)
+            $first = $middle = $last = $suffix = '';
+            if ($stmtName = $mysqli->prepare("SELECT first_name, middle_name, last_name, suffix_name FROM residents WHERE id = ? LIMIT 1")) {
+                $stmtName->bind_param("i", $res_id);
+                $stmtName->execute();
+                $stmtName->bind_result($first, $middle, $last, $suffix);
+                $stmtName->fetch();
+                $stmtName->close();
+            }
+            if ($first === null)  $first  = '';
+            if ($middle === null) $middle = '';
+            if ($last === null)   $last   = '';
+            if ($suffix === null) $suffix = '';
+
+            if ($first === '' || $last === '') {
+                ob_clean();
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Resident name not found; cannot create BESO entry.'
+                ]);
+                $mysqli->close();
+                exit;
+            }
+
+            // ✅ employee_id should be the current logged-in user (prefer employee_id session, else user id)
+            $employeeId = currentUserId();
+            if ($employeeId === 0) {
+                error_log('[BESO] employee_id resolved to 0; session keys: '.json_encode(array_keys($_SESSION)));
+            }
+
             $nowPh = (new DateTime('now', new DateTimeZone('Asia/Manila')))->format('Y-m-d H:i:s');
+
+            // ✅ INSERT matching BESO columns (no res_id)
             $besoInsert = $mysqli->prepare("
                 INSERT INTO beso (
-                    res_id, education_attainment, course, employee_id, beso_delete_status, created_at
-                ) VALUES (?, ?, ?, 0, 0, ?)
+                    firstName, middleName, lastName, suffixName,
+                    education_attainment, course, employee_id,
+                    beso_delete_status, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?)
             ");
-            $besoInsert->bind_param("isss", $res_id, $education, $course, $nowPh);
+            $besoInsert->bind_param(
+                "ssssssis",
+                $first, $middle, $last, $suffix,
+                $education, $course, $employeeId,
+                $nowPh
+            );
             $besoInsert->execute();
 
             // ✅ Audit: BESO record added (logs_name = 28)

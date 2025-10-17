@@ -66,7 +66,7 @@ function send_pw_change_link(string $toEmail, string $verifyUrl): void {
 
     $safeUrl = htmlspecialchars($verifyUrl, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
-    $buildMessage = function(PHPMailer $m) use ($toEmail, $safeUrl, $mailboxUser) {
+    $buildMessage = function(PHPMailer $m) use ($toEmail, $safeUrl, $mailboxUser, $verifyUrl) {
         $m->setFrom($mailboxUser, 'Barangay Bugo');
         $m->addAddress($toEmail);
         $m->addBCC($mailboxUser); // TEMP: verify delivery; remove later
@@ -112,10 +112,7 @@ function send_pw_change_link(string $toEmail, string $verifyUrl): void {
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;  // 587
         }
 
-        // Optional SMTP dialog logs:
-        // $mail->SMTPDebug   = 2;
-        // $mail->Debugoutput = function($str,$lvl){ error_log("SMTP[$lvl] $str"); };
-
+        // $mail->SMTPDebug = 2; // optional debug
         $buildMessage($mail);
         $mail->send();
     };
@@ -150,7 +147,6 @@ function send_pw_change_link(string $toEmail, string $verifyUrl): void {
             }
         }
     } finally {
-        // Keep DB connection alive after SMTP attempts
         if (isset($GLOBALS['mysqli']) && $GLOBALS['mysqli'] instanceof mysqli) {
             if (!@$GLOBALS['mysqli']->ping() && function_exists('db_connection')) {
                 $GLOBALS['mysqli'] = db_connection();
@@ -185,12 +181,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['current_password'])) 
     $stmt->fetch();
     $stmt->close();
 
-    if (!$residentEmail || !filter_var($residentEmail, FILTER_VALIDATE_EMAIL)) {
-        set_flash('message', ['type' => 'err', 'text' => 'Your account email looks invalid. Please update your email first.']);
-        header("Location: " . enc_self('settings_section'));
-        exit();
-    }
+    // Decide whether we have a usable email for 2FA
+    $hasEmail = $residentEmail && filter_var($residentEmail, FILTER_VALIDATE_EMAIL);
 
+    // 2) Validate current password and new password
     if (!password_verify($currentPassword, $hashedPassword)) {
         set_flash('message', ['type' => 'err', 'text' => 'Current password is incorrect.']);
         header("Location: " . enc_self('settings_section'));
@@ -209,7 +203,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['current_password'])) 
         exit();
     }
 
-    // 2) Complexity rules
+    // 3) Complexity rules
     $ok =
         strlen($newPassword) >= 8 &&
         preg_match('/[A-Z]/', $newPassword) &&
@@ -223,68 +217,98 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['current_password'])) 
         exit();
     }
 
-    // 3) Create pending request instead of updating immediately
-    $rawToken     = bin2hex(random_bytes(32));   // 64 hex chars
-    $tokenHashHex = hash('sha256', $rawToken);   // store hex hash
-    $newHash      = password_hash($newPassword, PASSWORD_DEFAULT);
+    // 4) Branch: with email (2FA) vs no email (immediate change)
+    if ($hasEmail) {
+        // --- Existing 2FA via email flow ---
+        $rawToken     = bin2hex(random_bytes(32));   // 64 hex chars
+        $tokenHashHex = hash('sha256', $rawToken);   // store hex hash
+        $newHash      = password_hash($newPassword, PASSWORD_DEFAULT);
 
-    $createdAt = date('Y-m-d H:i:s');
-    $expiresAt = date('Y-m-d H:i:s', time() + 20 * 60); // 20 min
+        $createdAt = date('Y-m-d H:i:s');
+        $expiresAt = date('Y-m-d H:i:s', time() + 20 * 60); // 20 min
 
-    // Ensure only one active request at a time
-    $stmt = $mysqli->prepare("DELETE FROM password_change_requests WHERE resident_id = ? AND used = 0");
-    $stmt->bind_param("i", $loggedInResidentId);
-    $stmt->execute();
-    $stmt->close();
-
-    $stmt = $mysqli->prepare("
-        INSERT INTO password_change_requests (resident_id, token_hash, new_password_hash, created_at, expires_at, used)
-        VALUES (?, ?, ?, ?, ?, 0)
-    ");
-    $stmt->bind_param("issss", $loggedInResidentId, $tokenHashHex, $newHash, $createdAt, $expiresAt);
-    $okInsert = $stmt->execute();
-    $stmt->close();
-
-    if (!$okInsert) {
-        set_flash('message', ['type' => 'err', 'text' => 'Could not create verification request. Please try again.']);
-        header("Location: " . enc_self('settings_section'));
-        exit();
-    }
-
-    // 4) Build verify link pointing to auth/settings/verify_change.php
-    $scheme   = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-    $host     = $_SERVER['HTTP_HOST'];
-    $baseDir  = rtrim(str_replace('\\','/', dirname($_SERVER['SCRIPT_NAME'])), '/');
-    $verifyUrl = sprintf(
-        '%s://%s%s/verify_change.php?rid=%d&t=%s',
-        $scheme,
-        $host,
-        $baseDir,
-        (int)$loggedInResidentId,
-        urlencode($rawToken)
-    );
-
-    // 5) Send email (with fallbacks)
-    try {
-        send_pw_change_link($residentEmail, $verifyUrl);
-
-        set_flash('message', ['type' => 'ok', 'text' => 'We sent a verification link to your email. The password will change after you confirm.']);
-        header("Location: " . enc_self('settings_section'));
-        exit();
-    } catch (Throwable $e) {
-        // Clean up pending record if email fails
+        // Ensure only one active request at a time
         $stmt = $mysqli->prepare("DELETE FROM password_change_requests WHERE resident_id = ? AND used = 0");
         $stmt->bind_param("i", $loggedInResidentId);
         $stmt->execute();
         $stmt->close();
 
-        set_flash('message', ['type' => 'err', 'text' => 'Could not send verification email. Please try again.']);
+        $stmt = $mysqli->prepare("
+            INSERT INTO password_change_requests (resident_id, token_hash, new_password_hash, created_at, expires_at, used)
+            VALUES (?, ?, ?, ?, ?, 0)
+        ");
+        $stmt->bind_param("issss", $loggedInResidentId, $tokenHashHex, $newHash, $createdAt, $expiresAt);
+        $okInsert = $stmt->execute();
+        $stmt->close();
+
+        if (!$okInsert) {
+            set_flash('message', ['type' => 'err', 'text' => 'Could not create verification request. Please try again.']);
+            header("Location: " . enc_self('settings_section'));
+            exit();
+        }
+
+        // Build verify link pointing to auth/settings/verify_change.php
+        $scheme   = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        $host     = $_SERVER['HTTP_HOST'];
+        $baseDir  = rtrim(str_replace('\\','/', dirname($_SERVER['SCRIPT_NAME'])), '/');
+        $verifyUrl = sprintf(
+            '%s://%s%s/verify_change.php?rid=%d&t=%s',
+            $scheme,
+            $host,
+            $baseDir,
+            (int)$loggedInResidentId,
+            urlencode($rawToken)
+        );
+
+        // Send email (with fallbacks)
+        try {
+            send_pw_change_link($residentEmail, $verifyUrl);
+
+            set_flash('message', ['type' => 'ok', 'text' => 'We sent a verification link to your email. The password will change after you confirm.']);
+            header("Location: " . enc_self('settings_section'));
+            exit();
+        } catch (Throwable $e) {
+            // Clean up pending record if email fails
+            $stmt = $mysqli->prepare("DELETE FROM password_change_requests WHERE resident_id = ? AND used = 0");
+            $stmt->bind_param("i", $loggedInResidentId);
+            $stmt->execute();
+            $stmt->close();
+
+            set_flash('message', ['type' => 'err', 'text' => 'Could not send verification email. Please try again.']);
+            header("Location: " . enc_self('settings_section'));
+            exit();
+        }
+
+    } else {
+        // --- No valid email: bypass email 2FA → change immediately ---
+        $newHash = password_hash($newPassword, PASSWORD_DEFAULT);
+
+        // Clean up any stale pending requests
+        $stmt = $mysqli->prepare("DELETE FROM password_change_requests WHERE resident_id = ? AND used = 0");
+        $stmt->bind_param("i", $loggedInResidentId);
+        $stmt->execute();
+        $stmt->close();
+
+        // Update password now
+        $stmt = $mysqli->prepare("UPDATE residents SET password = ? WHERE id = ?");
+        $stmt->bind_param("si", $newHash, $loggedInResidentId);
+        $okUpd = $stmt->execute();
+        $stmt->close();
+
+        if (!$okUpd) {
+            set_flash('message', ['type' => 'err', 'text' => 'Could not update your password right now. Please try again.']);
+            header("Location: " . enc_self('settings_section'));
+            exit();
+        }
+
+        // session_regenerate_id(true); // optional hardening
+
+        set_flash('message', ['type' => 'ok', 'text' => 'Your password has been updated. (Tip: add an email to enable verification links next time.)']);
         header("Location: " . enc_self('settings_section'));
         exit();
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -300,37 +324,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['current_password'])) 
    <style>
   :root{
     /* ✅ Default = Light Theme */
-    --bg: #f4f6f9;          /* soft page background */
-    --card: #ffffff;        /* white cards */
-    --sidebar-bg: #ffffff;  /* white sidebar */
-    --sidebar-hover:#f1f3f6;/* light hover */
+    --bg: #f4f6f9;
+    --card: #ffffff;
+    --sidebar-bg: #ffffff;
+    --sidebar-hover:#f1f3f6;
     --accent:#0d6efd;
     --border:#dee2e6;
     --text:#212529;
     --text-muted:#6c757d;
   }
-
-  /* 🌙 Comfort-Dark (not black) — still light and readable */
   @media (prefers-color-scheme: dark){
     :root{
-      --bg:#eef2f6;             /* very light gray instead of dark */
-      --card:#ffffff;           /* keep cards white */
-      --sidebar-bg:#ffffff;     /* white sidebar */
-      --sidebar-hover:#f1f3f6;  /* subtle hover */
+      --bg:#eef2f6;
+      --card:#ffffff;
+      --sidebar-bg:#ffffff;
+      --sidebar-hover:#f1f3f6;
       --accent:#0d6efd;
-      --border:#d9dee5;         /* soft border */
-      --text:#1f2a37;           /* dark text for readability */
+      --border:#d9dee5;
+      --text:#1f2a37;
       --text-muted:#556170;
     }
   }
-
   html, body{ height:100%; }
-  body{
-    background:var(--bg);
-    color:var(--text);
-  }
-
-  /* Topbar (mobile) — keep light in both modes */
+  body{ background:var(--bg); color:var(--text); }
   .topbar{
     position:sticky; top:0; z-index:1030;
     -webkit-backdrop-filter:saturate(180%) blur(6px);
@@ -338,77 +354,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['current_password'])) 
     background:rgba(255,255,255,.75);
     border-bottom:1px solid var(--border);
   }
-
-  /* Sidebar */
   .sidebar{
     background:var(--sidebar-bg);
     color:var(--text);
     min-width:240px; max-width:240px;
   }
   .sidebar a{
-    color:var(--text);
-    text-decoration:none;
+    color:var(--text); text-decoration:none;
     display:flex; align-items:center; gap:.6rem;
     padding:.75rem 1rem; border-left:4px solid transparent;
     transition: background-color .15s ease, color .15s ease;
   }
-  .sidebar a:hover{
-    background:var(--sidebar-hover);
-    color:var(--text);                 /* ❗ no white text on light bg */
-  }
+  .sidebar a:hover{ background:var(--sidebar-hover); color:var(--text); }
   .sidebar a.active{
     background:var(--sidebar-hover);
     border-left-color:var(--accent);
-    color:var(--text);
-    font-weight:600;
+    color:var(--text); font-weight:600;
   }
-
-  /* Main layout */
-  .layout{
-    display:grid; grid-template-columns:1fr; gap:1.25rem;
-  }
+  .layout{ display:grid; grid-template-columns:1fr; gap:1.25rem; }
   @media (min-width: 992px){
-    .layout{
-      grid-template-columns:260px 1fr; align-items:start;
-    }
+    .layout{ grid-template-columns:260px 1fr; align-items:start; }
     .sidebar-wrapper{
-      position:sticky; top:72px; /* below topbar */
+      position:sticky; top:72px;
       height:calc(100dvh - 88px);
-      overflow:auto;
-      border-right:1px solid var(--border);
+      overflow:auto; border-right:1px solid var(--border);
       background:var(--sidebar-bg);
     }
   }
-
-  /* Cards / modules */
-  .module{
-    background:var(--card);
-    border:1px solid var(--border);
-    border-radius:16px;
-    padding:20px;
-    box-shadow:0 4px 14px rgba(0,0,0,.04); /* softer, lighter */
-  }
-  .module h5{
-    display:flex; align-items:center; gap:.6rem; margin-bottom:1rem;
-  }
+  .module{ background:var(--card); border:1px solid var(--border); border-radius:16px; padding:20px; box-shadow:0 4px 14px rgba(0,0,0,.04); }
+  .module h5{ display:flex; align-items:center; gap:.6rem; margin-bottom:1rem; }
   .helper-text{ color:var(--text-muted); }
-
-  /* Password strength checklist */
   .req-list{ list-style:none; padding-left:0; margin:.5rem 0 0; }
   .req-list li{ display:flex; align-items:center; gap:.5rem; font-size:.9rem; }
-  .req-ok{ color:#198754; }
-  .req-bad{ color:#dc3545; }
-
-  /* Focus */
-  .btn:focus, .form-control:focus{
-    box-shadow:0 0 0 .2rem rgba(13,110,253,.15);
-  }
-
-  /* Page padding */
-  .page-wrap{ padding:16px; }
-  @media (min-width: 992px){
-    .page-wrap{ padding:24px; }
-  }
+  .req-ok{ color:#198754; } .req-bad{ color:#dc3545; }
+  .btn:focus, .form-control:focus{ box-shadow:0 0 0 .2rem rgba(13,110,253,.15); }
+  .page-wrap{ padding:16px; } @media (min-width: 992px){ .page-wrap{ padding:24px; } }
 </style>
 
 </head>
@@ -417,34 +397,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['current_password'])) 
 <!-- Mobile topbar -->
 <nav class="topbar navbar navbar-light px-2 px-sm-3">
     <div class="d-flex w-100 align-items-end justify-content-center">
-        <!-- <button class="btn btn-outline-secondary d-lg-none" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNav" aria-controls="offcanvasNav" aria-label="Open navigation">
-            <i class="bi bi-list"></i>
-        </button> -->
         <span class="fw-semibold">Account Settings</span>
-        <!-- <a class="btn btn-outline-primary btn-sm d-none d-sm-inline-flex" href="/bugo-resident-side/<?php echo enc_page('admin_dashboard'); ?>">
-            <i class="bi bi-house-door me-1"></i> Home
-        </a> -->
     </div>
 </nav>
 
 <div class="page-wrap container-fluid">
     <div class="layout">
-        <!-- Desktop sidebar -->
-        <div class="sidebar-wrapper d-none d-lg-block rounded-end">
-            <div class="sidebar h-100 py-3">
-                <div class="px-3 pb-3">
-                    <div class="text-white-50 small">Navigation</div>
-                </div>
-                <a href="<?php echo enc_page('homepage'); ?>"
-                   class="<?php echo (isset($_GET['page']) && $_GET['page'] === 'homepage') ? 'active' : ''; ?>">
-                    <i class="bi bi-house-door"></i> Home
-                </a>
-                <?php $settings_link = enc_page('settings_section', 'settings.php?'); ?>
-                <a href="<?= $settings_link ?>" class="active">
-                    <i class="bi bi-gear"></i> Settings
-                </a>
-            </div>
-        </div>
+
+<!-- Desktop sidebar -->
+<div class="sidebar-wrapper d-none d-lg-block rounded-end">
+  <div class="sidebar h-100 py-3">
+    <div class="px-3 pb-3">
+      <div class="text-white-50 small">Navigation</div>
+    </div>
+
+    <a href="<?php echo enc_page('homepage'); ?>"
+       class="<?php echo (isset($_GET['page']) && $_GET['page'] === 'homepage') ? 'active' : ''; ?>">
+      <i class="bi bi-house-door"></i> Home
+    </a>
+
+    <?php $settings_link = enc_page('settings_section', 'settings.php?'); ?>
+    <a href="<?= $settings_link ?>" class="active">
+      <i class="bi bi-gear"></i> Settings
+    </a>
+
+    <!-- NEW: Change Username (opens the same modal) -->
+    <a href="#"
+       data-bs-toggle="modal"
+       data-bs-target="#changeUsernameModal">
+      <i class="bi bi-person-badge"></i> Change Username
+    </a>
+  </div>
+</div>
 
         <!-- Content -->
         <main class="content">
@@ -565,11 +549,69 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['current_password'])) 
       <a class="list-group-item list-group-item-action d-flex align-items-center gap-2" href="<?php echo enc_page('homepage'); ?>">
         <i class="bi bi-house-door"></i> Home
       </a>
+
       <?php $settings_link = enc_page('settings_section', 'settings.php?'); ?>
-      <a class="list-group-item list-group-item-action active d-flex align-items-center gap-2" href="<?= $settings_link ?>">
+      <a class="list-group-item list-group-item-action d-flex align-items-center gap-2" href="<?= $settings_link ?>">
         <i class="bi bi-gear"></i> Settings
       </a>
+
+      <!-- NEW: Change Username (opens modal; auto-closes offcanvas) -->
+      <button type="button"
+              class="list-group-item list-group-item-action d-flex align-items-center gap-2 js-open-change-username">
+        <i class="bi bi-person-badge"></i> Change Username
+      </button>
     </div>
+  </div>
+</div>
+
+<!-- Change Username Modal -->
+<?php
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
+if (empty($_SESSION['csrf'])) { $_SESSION['csrf'] = bin2hex(random_bytes(32)); }
+$csrf = $_SESSION['csrf'];
+?>
+<div class="modal fade" id="changeUsernameModal" tabindex="-1" aria-labelledby="changeUsernameLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form class="modal-content" method="POST" action="/auth/settings/change_username.php" autocomplete="off">
+      <div class="modal-header">
+        <h5 class="modal-title" id="changeUsernameLabel">Change Username</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="currentPassword" class="form-label">Current Password</label>
+          <div class="input-group">
+            <input type="password" class="form-control" id="currentPassword" name="current_password" required>
+            <button class="btn btn-outline-secondary" type="button"
+              onclick="const i=this.closest('.input-group').querySelector('input'); const t=this; if(i.type==='password'){i.type='text'; t.textContent='Hide';} else {i.type='password'; t.textContent='Show';}">
+              Show
+            </button>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="newUsername" class="form-label">New Username</label>
+          <input
+            type="text"
+            class="form-control"
+            id="newUsername"
+            name="new_username"
+            pattern="^[A-Za-z0-9._-]{4,30}$"
+            title="4–30 chars; letters, numbers, dot (.), underscore (_), dash (-) only."
+            required
+          >
+          <div class="form-text">Use 4–30 characters. Letters, numbers, dot (.), underscore (_), dash (-).</div>
+        </div>
+
+        <input type="hidden" name="csrf" value="<?= htmlspecialchars($csrf) ?>">
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+      </div>
+    </form>
   </div>
 </div>
 
@@ -613,7 +655,6 @@ function togglePassword(inputId, button) {
 const pwBar = document.getElementById('pw-bar');
 const strengthText = document.getElementById('password-strength');
 
-// Update checklist icon state
 function setReqState(el, ok){
     const icon = el.querySelector('i');
     icon.classList.toggle('bi-x-circle', !ok);
@@ -622,10 +663,8 @@ function setReqState(el, ok){
     icon.classList.toggle('req-ok', ok);
 }
 
-// One canonical password-strength checker
 function checkPasswordStrength(password) {
     let strength = 0;
-
     const hasLen  = password.length >= 8;
     const hasCase = /[a-z]/.test(password) && /[A-Z]/.test(password);
     const hasNum  = /[0-9]/.test(password);
@@ -686,7 +725,35 @@ function disableSubmit(form) {
         }
     }
 }
+
+// Offcanvas -> Modal (mobile)
+document.querySelectorAll('.js-open-change-username').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const offcanvasEl = document.getElementById('offcanvasNav');
+    if (offcanvasEl) {
+      const oc = bootstrap.Offcanvas.getInstance(offcanvasEl) || new bootstrap.Offcanvas(offcanvasEl);
+      oc.hide();
+      setTimeout(() => {
+        const modalEl = document.getElementById('changeUsernameModal');
+        if (modalEl) {
+          const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+          modal.show();
+        }
+      }, 250);
+    }
+  });
+});
 </script>
+
+<?php if (session_status() === PHP_SESSION_NONE) { session_start(); } ?>
+<?php if (!empty($_SESSION['flash'])): ?>
+  <?php foreach ($_SESSION['flash'] as $type => $msg): ?>
+    <div class="alert alert-<?= htmlspecialchars($type === 'error' ? 'danger' : ($type === 'success' ? 'success' : 'info')) ?> alert-dismissible fade show" role="alert">
+      <?= htmlspecialchars($msg) ?>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <?php endforeach; unset($_SESSION['flash']); ?>
+<?php endif; ?>
 
 </body>
 </html>

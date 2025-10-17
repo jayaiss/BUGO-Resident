@@ -56,3 +56,13 @@ Stack trace:
 #0 /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/fetch_time_slots.php(105): mysqli->prepare()
 #1 {main}
   thrown in /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/fetch_time_slots.php on line 105
+[17-Oct-2025 10:18:45 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'res_id' in 'WHERE' in /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/check_residency_used_for_beso.php:65
+Stack trace:
+#0 /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/check_residency_used_for_beso.php(65): mysqli->prepare()
+#1 {main}
+  thrown in /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/check_residency_used_for_beso.php on line 65
+[17-Oct-2025 10:19:26 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'res_id' in 'WHERE' in /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/check_residency_used_for_beso.php:65
+Stack trace:
+#0 /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/check_residency_used_for_beso.php(65): mysqli->prepare()
+#1 {main}
+  thrown in /home/hzvl0mk3xdsn/public_html/bugoportal.site/ajax/check_residency_used_for_beso.php on line 65
